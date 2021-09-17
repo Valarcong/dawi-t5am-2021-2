@@ -14,6 +14,7 @@ import model.Usuario;
 import javax.persistence.EntityManager;
 import javax.persistence.EntityManagerFactory;
 import javax.persistence.Persistence;
+import javax.persistence.TypedQuery;
 import javax.swing.JButton;
 import java.awt.event.ActionListener;
 import java.util.List;
@@ -22,6 +23,7 @@ import javax.swing.JTextArea;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.JLabel;
+import javax.swing.JOptionPane;
 import javax.swing.JComboBox;
 
 public class FrmLogin extends JFrame {
@@ -90,5 +92,43 @@ public class FrmLogin extends JFrame {
 	
 	void registrar() {
 		
+		String usuario = leerUsuario();
+		String clave = leerClave();
+		EntityManagerFactory fabrica = Persistence.createEntityManagerFactory("mysql");
+		EntityManager em = fabrica.createEntityManager();
+			
+
+		String sql2 = "select u from Usuario u where u.usuario = :xusr and u.clave=  :xcla";
+		
+		TypedQuery<Usuario> query = em.createQuery(sql2, Usuario.class);
+		query.setParameter("xusr", usuario);
+		query.setParameter("xcla", clave);
+		
+		Usuario u = null;
+		try {
+				u = query.getSingleResult();
+		}catch (Exception e) {
+			
+		}
+		if (u==null) {
+			aviso("codigo no existe");
+			
+		}else {
+			aviso("Bienvenido  : "+ u.getNombre() +  "\n" + u);
+		}
+		
+		em.close();
 	}
+	
+	void aviso(String string) {
+		JOptionPane.showMessageDialog(this, string);
+	}
+	
+	private String leerUsuario() {
+		return txtUsuario.getText();
+	}
+	private String leerClave() {
+	return txtClave.getText();
+	}
+	
 }
